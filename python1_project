@@ -1,0 +1,60 @@
+import sqlite3
+
+# Database connection
+conn = sqlite3.connect('restaurant.db')
+cursor = conn.cursor()
+
+# Create the FoodItems table
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS FoodItems (
+        FoodID INTEGER PRIMARY KEY AUTOINCREMENT,
+        Name TEXT NOT NULL,
+        Quantity TEXT NOT NULL,
+        Price REAL NOT NULL,
+        Discount REAL NOT NULL,
+        Stock INTEGER NOT NULL
+    )
+''')
+conn.commit()
+
+def add_food_item(name, quantity, price, discount, stock):
+    cursor.execute('''
+        INSERT INTO FoodItems (Name, Quantity, Price, Discount, Stock)
+        VALUES (?, ?, ?, ?, ?)
+    ''', (name, quantity, price, discount, stock))
+    conn.commit()
+    print("Food item added successfully!")
+
+def view_food_items():
+    cursor.execute('SELECT * FROM FoodItems')
+    items = cursor.fetchall()
+    if not items:
+        print("No food items found.")
+    else:
+        print("FoodID  Name               Quantity  Price   Discount  Stock")
+        for item in items:
+            print(f"{item[0]:<7}  {item[1]:<18} {item[2]:<9} {item[3]:<7} {item[4]:<10} {item[5]:<6}")
+
+while True:
+    print("\nOptions:")
+    print("1. Add Food Item")
+    print("2. View Food Items")
+    print("3. Exit")
+    choice = input("Enter your choice: ")
+
+    if choice == '1':
+        name = input("Enter food name: ")
+        quantity = input("Enter quantity: ")
+        price = float(input("Enter price: "))
+        discount = float(input("Enter discount: "))
+        stock = int(input("Enter stock: "))
+        add_food_item(name, quantity, price, discount, stock)
+    elif choice == '2':
+        view_food_items()
+    elif choice == '3':
+        break
+    else:
+        print("Invalid choice. Please try again.")
+
+# Close the database connection
+conn.close()
